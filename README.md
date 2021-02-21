@@ -2,6 +2,8 @@
 
 This application does upgrade firmware of the built-in keyboard and touchpad.
 
+If you are interested in the firmware, look upstream. This fork is focussed on reverse engineering the JTAG interface of the SH68F83 MCU.
+
 ## Compiling
 
 ```bash
