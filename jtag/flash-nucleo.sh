@@ -68,13 +68,19 @@ arm-none-eabi-objcopy -O ihex .tmp/fake-bl .tmp/jet51a_1.hex
 arm-none-eabi-objcopy -I binary -O ihex --change-addresses 0x08010000 ./JET51A_V1.90.ARM .tmp/jet51a_2.hex
 #srec_cat .tmp/jet51a_{1,2}.hex >.tmp/jet51a.hex
 
-# symbols generated from Vivisect: for x in vw.getNames(): print("--add-symbol {}=.text2:0x{:04x}".format(x[1], x[0]-0x08010000))
+# symbols generated from Vivisect: import re; for x in vw.getNames(): print("--add-symbol {}=.text2:0x{:04x}".format(re.sub(r"[^0-9a-zA-Z_]", "_", x[1]), x[0]-0x08010000))
 #FIXME replace spaces in symbol names ^^
 arm-none-eabi-objcopy .tmp/fake-bl .tmp/both --add-section .text2=./JET51A_V1.90.ARM --set-section-flags .text2=alloc,contents,load,readonly,code --change-section-address .text2=0x08010000 @jet51a-symbols.txt
 
-openocd -f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg -l .tmp/openocd.log &
-# monitor program .tmp/jet51a.hex verify
+if false ; then
+  # This doesn't work because we need ctrl-c in GDB and that kills openocd.
+  openocd -f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg -l .tmp/openocd.log &
+  # monitor program .tmp/jet51a.hex verify
 
-sleep 0.2
-arm-none-eabi-gdb -x openocd.gdb
+  sleep 0.2
+  arm-none-eabi-gdb -x openocd.gdb
+else
+  echo Please start GDB in another terminal: arm-none-eabi-gdb -x openocd.gdb
+  openocd -f interface/stlink-v2-1.cfg -f target/stm32f4x.cfg
+fi
 
